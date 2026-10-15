@@ -31,6 +31,10 @@
 #include "avc_ss.h"
 #include "classmap.h"
 #include "hash.h"
+#ifdef CONFIG_SECURITY_SEATD
+#include "sea_signal.h"
+#endif
+
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/avc.h>
@@ -1009,12 +1013,21 @@ static noinline int avc_denied(u32 ssid, u32 tsid,
 			       u8 driver, u8 xperm, unsigned int flags,
 			       struct av_decision *avd)
 {
+#ifdef CONFIG_SECURITY_SEATD
+       if (!(avd->flags & AVD_FLAGS_PERMISSIVE))
+               sea_detect_sensitive_domain(ssid, tsid, requested, avd);
+#endif
+
 	if (flags & AVC_STRICT)
 		return -EACCES;
 
 	if (enforcing_enabled() &&
 	    !(avd->flags & AVD_FLAGS_PERMISSIVE))
 		return -EACCES;
+
+#ifdef CONFIG_SECURITY_SEATD
+       sea_detect_permissive(ssid, avd);
+#endif
 
 	avc_update_node(AVC_CALLBACK_GRANT, requested, driver,
 			xperm, ssid, tsid, tclass, avd->seqno, NULL, flags);

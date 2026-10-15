@@ -745,6 +745,13 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg)
 
 		if (server_unresponsive(server))
 			return -ECONNABORTED;
+                spin_lock(&server->srv_lock);
+                if (!server->ssocket || server->ssocket->sk == NULL) {
+                        spin_unlock(&server->srv_lock);
+                        cifs_server_dbg(VFS, "Invalid socket state during receive\n");
+                        return -ENOTCONN;
+                }
+                spin_unlock(&server->srv_lock);
 		if (cifs_rdma_enabled(server) && server->smbd_conn)
 			length = smbd_recv(server->smbd_conn, smb_msg);
 		else

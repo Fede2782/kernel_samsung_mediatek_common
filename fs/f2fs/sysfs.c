@@ -28,7 +28,7 @@
 #define ST_LOG(fmt, ...)
 #endif
 
-#define SEC_BIGDATA_VERSION		(3)
+#define SEC_BIGDATA_VERSION		(4)
 
 static struct proc_dir_entry *f2fs_proc_root;
 
@@ -855,6 +855,7 @@ void f2fs_write_ddp_stats(struct f2fs_sb_info *sbi)
 	ret = submit_bio_wait(bio);
 	if (ret)
 		f2fs_warn(sbi, "extra_flag: Failed to submit bio, ret %d", ret);
+        bio_put(bio);
 	folio_end_writeback(folio);
 	folio_put(folio);
 }
