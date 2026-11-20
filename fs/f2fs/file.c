@@ -5102,8 +5102,10 @@ static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
 again:
 	if (dio) {
 		ret = f2fs_dio_read_iter(iocb, to);
-		if (ret == -EAGAIN && !(iocb->ki_flags & IOCB_NOWAIT))
+		if (ret == -EAGAIN && !(iocb->ki_flags & IOCB_NOWAIT)) {
+			dio = f2fs_should_use_dio(inode, iocb, to);
 			goto again;
+		}
 	} else {
 		ret = filemap_read(iocb, to, 0);
 		if (ret > 0)

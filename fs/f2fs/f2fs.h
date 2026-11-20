@@ -1747,6 +1747,7 @@ struct f2fs_sec_fsck_info {
 	u32 fsck_exit_code;
 	u32 valid_node_count;
 	u32 valid_inode_count;
+	u64 total_16k_overhead_blks;
 };
 
 enum sec_ddp_stat_type {

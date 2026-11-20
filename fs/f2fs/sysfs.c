@@ -481,6 +481,7 @@ static void __sec_bigdata_init_value(struct f2fs_sb_info *sbi,
 		sbi->sec_fsck_stat.fsck_exit_code = 0;
 		sbi->sec_fsck_stat.valid_node_count = 0;
 		sbi->sec_fsck_stat.valid_inode_count = 0;
+		sbi->sec_fsck_stat.total_16k_overhead_blks = 0;
 	} else if (!strcmp(attr_name, "sec_defrag_stat")) {
 		sbi->s_sec_part_best_extents = 0;
 		sbi->s_sec_part_current_extents = 0;
@@ -616,13 +617,14 @@ static ssize_t f2fs_sbi_show(struct f2fs_attr *a,
 
 		len = snprintf(buf, PAGE_SIZE,
 		"\"%s\":\"%llu\",\"%s\":\"%llu\",\"%s\":\"%llu\",\"%s\":\"%u\","
-		"\"%s\":\"%u\",\"%s\":\"%u\"\n",
+		"\"%s\":\"%u\",\"%s\":\"%u\",\"%s\":\"%llu\"\n",
 			"FSCK_RBYTES",	sbi->sec_fsck_stat.fsck_read_bytes,
 			"FSCK_WBYTES",	sbi->sec_fsck_stat.fsck_written_bytes,
 			"FSCK_TIME_MS",	sbi->sec_fsck_stat.fsck_elapsed_time,
 			"FSCK_EXIT",	sbi->sec_fsck_stat.fsck_exit_code,
 			"FSCK_VNODES",	sbi->sec_fsck_stat.valid_node_count,
-			"FSCK_VINODES",	sbi->sec_fsck_stat.valid_inode_count);
+			"FSCK_VINODES",	sbi->sec_fsck_stat.valid_inode_count,
+			"LARGE_BLK_OH",	sbi->sec_fsck_stat.total_16k_overhead_blks);
 
 		if (!sbi->sec_hqm_preserve)
 			__sec_bigdata_init_value(sbi, a->attr.name);

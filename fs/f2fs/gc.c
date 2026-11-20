@@ -1887,7 +1887,6 @@ static int do_garbage_collect(struct f2fs_sb_info *sbi,
 		if (IS_CURSEC(sbi, GET_SEC_FROM_SEG(sbi, segno))) {
 			f2fs_err(sbi, "%s: segment %u is used by log",
 							__func__, segno);
-			f2fs_bug_on(sbi, 1);
 			goto skip;
 		}
 
@@ -2445,7 +2444,7 @@ static int __f2fs_resize_fs(struct file *filp, __u64 block_count)
 		return -EROFS;
 	}
 
-	f2fs_down_write(&sbi->gc_lock);
+	f2fs_down_write_trace(&sbi->gc_lock, &glc);
 
 	/* stop CP to protect MAIN_SEC in free_segment_range */
 	f2fs_lock_op(sbi, &lc);
@@ -2466,7 +2465,7 @@ out_unlock:
 	f2fs_unlock_op(sbi, &lc);
 	if (err) {
 		clear_sbi_flag(sbi, SBI_IS_RESIZEFS);
-		f2fs_up_write(&sbi->gc_lock);
+		f2fs_up_write_trace(&sbi->gc_lock, &glc);
 		thaw_super(sbi->sb, FREEZE_HOLDER_USERSPACE);
 		return err;
 	}
@@ -2568,11 +2567,13 @@ int f2fs_gc_for_pinned_type(struct f2fs_sb_info *sbi)
 	};
 	int ret = 0;
 	unsigned long long gc_start_time = 0, gc_end_time = 0;
+	struct f2fs_lock_context glc;
+	struct f2fs_lock_context clc;
 
-	f2fs_down_write(&sbi->gc_lock);
+	f2fs_down_write_trace(&sbi->gc_lock, &glc);
 
 	f2fs_unpin_all_sections(sbi, true);
-	f2fs_down_write(&sbi->cp_global_sem);
+	f2fs_down_write_trace(&sbi->cp_global_sem, &clc);
 	gc_start_time = local_clock();
 gc_more:
 	segno = NULL_SEGNO;
@@ -2623,8 +2624,8 @@ out:
 	f2fs_update_sec_ddp_time_stats(sbi, gc_start_time, gc_end_time, DDP_MIGRATED_TTIME);
 	sbi->sec_ddp_stat.ddp_stats[DDP_MIGRATED_SEG_COUNT] += seg_freed;
 
-	f2fs_up_write(&sbi->cp_global_sem);
-	f2fs_up_write(&sbi->gc_lock);
+	f2fs_up_write_trace(&sbi->cp_global_sem, &clc);
+	f2fs_up_write_trace(&sbi->gc_lock, &glc);
 
 	return ret;
 }

@@ -615,7 +615,8 @@ struct f2fs_sb_extra_flag_blk {
 	__le32 valid_node_count;
 	__le32 valid_inode_count;
 	__le32 ddp_stats[8];
-	__u8   rsvd[4020];
+	__le64 total_16k_overhead_blks;
+	__u8   rsvd[4012];
 } __packed;
 
 #endif  /* _LINUX_F2FS_FS_H */

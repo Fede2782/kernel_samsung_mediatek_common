@@ -85,7 +85,7 @@ config FUSE_SUPPORT_STLOG
 
 config FUSE_WATCHDOG
 	bool "fuse watchdog"
-	default y
+	default n
 	depends on FUSE_FS
 	help
 	  Run fuse watchdog to prepare for the case of the fuse daemon process

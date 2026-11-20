@@ -437,6 +437,8 @@ void f2fs_get_fsck_stat(struct f2fs_sb_info *sbi)
 			le32_to_cpu(extra_blk->valid_node_count);
 	sbi->sec_fsck_stat.valid_inode_count =
 			le32_to_cpu(extra_blk->valid_inode_count);
+	sbi->sec_fsck_stat.total_16k_overhead_blks =
+			le64_to_cpu(extra_blk->total_16k_overhead_blks);
 
 	for (type = 0; type < NR_DDP_STAT_TYPE; type++)
 		sbi->sec_ddp_stat.ddp_stats[type] = le32_to_cpu(extra_blk->ddp_stats[type]);
@@ -2842,10 +2844,10 @@ skip:
 
 	limit_reserve_root(sbi);
 	*flags = (*flags & ~SB_LAZYTIME) | (sb->s_flags & SB_LAZYTIME);
-	f2fs_notice(sbi, "re-mounted. Opts: %s", data);
-
 
 	sbi->umount_lock_holder = NULL;
+	f2fs_notice(sbi, "re-mounted. Opts: %s", data);
+
 	return 0;
 restore_checkpoint:
 	if (need_enable_checkpoint) {

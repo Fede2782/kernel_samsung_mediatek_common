@@ -2357,8 +2357,13 @@ static const struct usb_audio_quirk_flags_table quirk_flags_table[] = {
 		   QUIRK_FLAG_DSD_RAW),
 	VENDOR_FLG(0x2d87, /* Cayin device */
 		   QUIRK_FLAG_DSD_RAW),
+#if defined(CONFIG_USB_HOST_SAMSUNG_FEATURE)
+	VENDOR_FLG(0x2fc6, /* Comture-inc devices */
+		   QUIRK_FLAG_DSD_RAW | QUIRK_FLAG_CTL_MSG_DELAY_1M),
+#else
 	VENDOR_FLG(0x2fc6, /* Comture-inc devices */
 		   QUIRK_FLAG_DSD_RAW),
+#endif
 	VENDOR_FLG(0x3336, /* HEM devices */
 		   QUIRK_FLAG_DSD_RAW),
 	VENDOR_FLG(0x3353, /* Khadas devices */
@@ -2371,8 +2376,6 @@ static const struct usb_audio_quirk_flags_table quirk_flags_table[] = {
 		   QUIRK_FLAG_DSD_RAW),
 #if defined(CONFIG_USB_HOST_SAMSUNG_FEATURE)
 	VENDOR_FLG(0x04e8, /* Samsung */
-		   QUIRK_FLAG_CTL_MSG_DELAY_1M),
-	VENDOR_FLG(0x2fc6, /* Comtrue */
 		   QUIRK_FLAG_CTL_MSG_DELAY_1M),
 #endif
 	{} /* terminator */
